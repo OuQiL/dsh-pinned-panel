@@ -95,7 +95,7 @@ Two rendering surfaces, one data source:
 
 Why the DOM seam at all: replacing the whole Workspace browser would mean reimplementing the app's session list and would break on upgrades. Adding a sibling group at the top is the smallest possible intervention — it only **inserts**, never hides or reorders anything the app renders.
 
-The rail icon is the shell's own panel button, whose click would select the `main` entry. The plugin captures that click at the document (capture phase) and, while anything is pinned, opens the newest pinned conversation instead; with nothing pinned the event is left alone and the page — with its empty state — opens as usual.
+The rail icon is the shell's own panel button, and its click selects the `main` entry registered under that id — the plugin cannot intercept that click reliably. So that entry is a **redirect**: the moment it mounts it opens the newest pinned conversation from a layout effect (before paint), and the panel is replaced by the conversation. With nothing pinned it renders the grouped page instead, empty state and all. The grouped page has its own second key, which the count in the sidebar group opens directly — no redirect.
 
 ### The seam is defensive
 
