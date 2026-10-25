@@ -31,7 +31,8 @@ Sidebar
 - **Rows are not duplicated into a private store.** The group reads the Host's own `pinnedSessionIds` and workspace membership; pinning/unpinning stays the shipped 📌 action (plus a ✕ on hover).
 - **Origin is visible.** Each row shows the workspace it belongs to; hover it for the full title.
 - **Original rows stay.** A pinned conversation is still listed under its own workspace — the Pinned group is an extra entry point, not a move.
-- **A stable full page too.** The 📌 icon in the sidebar rail opens a *Pinned* page that groups every pinned conversation by workspace. If a future DSH release rearranges the sidebar list, the page keeps working.
+- **One click from the rail, straight into the conversation.** The 📌 icon in the sidebar rail jumps to the **most recently updated pinned conversation** — no intermediate page. With nothing pinned it opens the Pinned page, whose empty state explains how to pin.
+- **A full Pinned page where it belongs.** The count next to the “Pinned” group header (or the empty state) opens a *Pinned* page that groups every pinned conversation by workspace. If a future DSH release rearranges the sidebar list, this page is the part that keeps working.
 
 ## Install
 
@@ -93,6 +94,8 @@ Two rendering surfaces, one data source:
 | **Pinned group in the list** | The shipped Workspace browser owns the **single** `sidebar.workspaces` slot, so there is no slot to add a group inside its list. The plugin mounts one always-present seat in `sidebar.panellist`, walks up from *its own* DOM node to the browser's scroll container, inserts one host element as the list's first child, and portals the group into it. A `MutationObserver` (plus a slow fallback tick) re-attaches after React rebuilds the list. |
 
 Why the DOM seam at all: replacing the whole Workspace browser would mean reimplementing the app's session list and would break on upgrades. Adding a sibling group at the top is the smallest possible intervention — it only **inserts**, never hides or reorders anything the app renders.
+
+The rail icon is the shell's own panel button, whose click would select the `main` entry. The plugin captures that click at the document (capture phase) and, while anything is pinned, opens the newest pinned conversation instead; with nothing pinned the event is left alone and the page — with its empty state — opens as usual.
 
 ### The seam is defensive
 
