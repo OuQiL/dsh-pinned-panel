@@ -131,6 +131,8 @@ node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
 
 没有构建步骤：`lib/client.js` 就是交付给客户端加载的浏览器模块
 （`window.__ModuleLoader__.load({ id, factory })`），页面加载时直接读取。
+它把同一个工厂同时注册到当前包名和改名前的 `@local/dsh-pinned-panel` 两个 id 上，
+这样仍装着旧包的 profile 不会报 `loaded without registering …` 而加载失败；旧包卸载后第二个注册自然闲置。
 
 ## 许可
 

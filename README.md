@@ -132,6 +132,10 @@ node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
 
 There is no build step: `lib/client.js` is the shipped browser module
 (`window.__ModuleLoader__.load({ id, factory })`), read directly by the client at page load.
+It registers the factory under both the current package id and the pre-rename
+`@local/dsh-pinned-panel` id, so a profile that still has the old package installed keeps
+loading instead of failing with `loaded without registering …`. The legacy id is inert once
+that package is uninstalled.
 
 ## License
 
