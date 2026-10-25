@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Pinned workspace",
+    "description": "Collects the pinned conversations of every workspace on one dedicated Pinned page; opening one returns to its original workspace."
+  }
+}

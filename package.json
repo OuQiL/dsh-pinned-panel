@@ -1,0 +1,57 @@
+{
+  "name": "dsh-pinned-panel",
+  "version": "0.1.0",
+  "description": "A dedicated Pinned area for DeepSeek Harness: a pinned group at the top of the sidebar session list plus a full Pinned page, opening every conversation in its original workspace.",
+  "license": "MIT",
+  "author": "OuQiL",
+  "type": "module",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "deepseek",
+    "harness",
+    "pinned",
+    "sidebar",
+    "workspace",
+    "web-gui"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OuQiL/dsh-pinned-panel.git"
+  },
+  "homepage": "https://github.com/OuQiL/dsh-pinned-panel#readme",
+  "bugs": {
+    "url": "https://github.com/OuQiL/dsh-pinned-panel/issues"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ]
+    }
+  }
+}

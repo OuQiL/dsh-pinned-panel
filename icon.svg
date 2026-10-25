@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Pinned workspace">
+  <rect width="64" height="64" rx="15" fill="#1d63d8"/>
+  <g fill="#ffffff" transform="translate(0 1)">
+    <rect x="21.33" y="9.07" width="21.33" height="8.27" rx="4.13"/>
+    <path d="M25.6 20.27h12.8v11.47l4 6.13v4H21.6v-4l4-6.13z"/>
+    <rect x="30.4" y="41.87" width="3.2" height="14.93" rx="1.6"/>
+  </g>
+</svg>
