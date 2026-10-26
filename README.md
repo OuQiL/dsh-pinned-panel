@@ -4,8 +4,8 @@
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20GUI-lightgrey.svg)](#requirements)
 [![dsh](https://img.shields.io/badge/dsh-0.2.x-4B6BFB.svg)](#requirements)
 
-> **A dedicated Pinned area for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).**
-> Pinned conversations stop being pinned *inside* one workspace: they are collected into a **Pinned group at the top of the sidebar**, expanded by default — and opening one still drops you back into **its original workspace**.
+> **A Pinned group at the top of the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) sidebar.**
+> Pinned conversations stop being pinned *inside* one workspace: they are collected into a **Pinned group first in the session list**, expanded by default — and opening one still drops you back into **its original workspace**.
 
 English | [简体中文](README.zh-CN.md)
 
@@ -15,7 +15,7 @@ English | [简体中文](README.zh-CN.md)
 
 ```
 Sidebar
-├─ 📌 Pinned                     3      ← new group, first in the list, expanded by default
+├─ 📌 Pinned                     3      ← first in the list, expanded by default
 │   ├─ 🔧 Fix expired login      14:32
 │   ├─ 📊 API diff report        Yesterday
 │   └─ 📝 Weekly draft           10-21
@@ -25,14 +25,13 @@ Sidebar
 └─ 📁 another-workspace
 ```
 
-- **Pinned group at the top of the sidebar list.** Same row metrics as the shipped session rows (32px rows, 34px group header, `--dsw-radius-md`, hover/focus rings), light and dark themes included.
+- **Pinned group first in the sidebar session list.** Same row metrics as the shipped session rows (32px rows, 34px group header, `--dsw-radius-md`, hover/focus rings), light and dark themes included.
 - **Expanded by default**, collapsible from its header (the choice is remembered in `localStorage`).
 - **Click a row → the conversation opens in its original workspace.** It uses the official `uiWorkspace.openSession()` call, exactly like clicking that row in the sidebar: same working directory, same context, same history.
 - **Rows are not duplicated into a private store.** The group reads the Host's own `pinnedSessionIds` and workspace membership; pinning/unpinning stays the shipped 📌 action (plus a ✕ on hover).
 - **Origin is visible.** Each row shows the workspace it belongs to; hover it for the full title.
 - **Original rows stay.** A pinned conversation is still listed under its own workspace — the Pinned group is an extra entry point, not a move.
-- **One click from the rail, straight into the conversation.** The 📌 icon in the sidebar rail jumps to the **most recently updated pinned conversation** — no intermediate page. With nothing pinned it opens the Pinned page, whose empty state explains how to pin.
-- **A full Pinned page where it belongs.** The count next to the “Pinned” group header (or the empty state) opens a *Pinned* page that groups every pinned conversation by workspace. If a future DSH release rearranges the sidebar list, this page is the part that keeps working.
+- **No extra panel, no extra page.** The plugin adds the group and nothing else; there is no pinned page and no rail icon to configure.
 
 ## Install
 
@@ -48,7 +47,7 @@ Sidebar
 
    (the dialog also accepts the full `https://github.com/OuQiL/dsh-pinned-panel` URL, a tarball, or an absolute local path)
 
-4. Reload the page. A 📌 appears in the sidebar rail and the **Pinned** group appears at the top of the conversation list.
+4. Reload the page. The **Pinned** group appears at the top of the conversation list.
 
 ### With the CLI
 
@@ -80,41 +79,38 @@ Settings → Plugins → *dsh-pinned-panel* → disable/uninstall, or `dsh plugi
 ## How it works
 
 ```
-pinned state (Host)            uiWorkspace service (shipped)
-  pinnedSessionIds  ─────┐        openSession(id) ──► selects the Session
-  items[].sessionIds ────┴──► Pinned group ──► unpinSession(id) ──► pin set
-                               (sidebar list + page)   (both official calls)
+pinned state (Host)                   uiWorkspace service (shipped)
+  pinnedSessionIds  ────┐                openSession(id)  ──► selects the Session
+  items[].sessionIds ───┴──► Pinned group ──► unpinSession(id) ──► writes the pin set
+                              (sidebar list)      (both official calls)
 ```
 
-Two rendering surfaces, one data source:
+The shipped Workspace browser owns the **single** `sidebar.workspaces` slot, so there is no slot to add a group inside its list. Replacing the whole browser would mean reimplementing the app's session list and would break on upgrades. The smallest intervention is a sibling group at the top:
 
-| Surface | How it is mounted |
-|---|---|
-| **Pinned page** | First-class slots: an icon in `sidebar.panellist` and a page under the same id in the `main` keyed slot (`ctx.layout.selectPanel('pinned')` switches to it). |
-| **Pinned group in the list** | The shipped Workspace browser owns the **single** `sidebar.workspaces` slot, so there is no slot to add a group inside its list. The plugin mounts one always-present seat in `sidebar.panellist`, walks up from *its own* DOM node to the browser's scroll container, inserts one host element as the list's first child, and portals the group into it. A `MutationObserver` (plus a slow fallback tick) re-attaches after React rebuilds the list. |
+1. The plugin mounts one **invisible seat** in the sidebar shell (`sidebar.footer.action`, an empty action beside Settings; the seat renders nothing).
+2. From that seat's own DOM node it walks up to the browser's list area, then finds the scroll container.
+3. It inserts one host element as the list's **first child** and portals the group into it, adopting the shipped group wrapper class so native spacing applies.
+4. A `MutationObserver` (plus a slow fallback tick) re-attaches the host after React rebuilds the list.
 
-Why the DOM seam at all: replacing the whole Workspace browser would mean reimplementing the app's session list and would break on upgrades. Adding a sibling group at the top is the smallest possible intervention — it only **inserts**, never hides or reorders anything the app renders.
-
-The rail icon is the shell's own panel button, and its click selects the `main` entry registered under that id — the plugin cannot intercept that click reliably. So that entry is a **redirect**: the moment it mounts it opens the newest pinned conversation from a layout effect (before paint), and the panel is replaced by the conversation. With nothing pinned it renders the grouped page instead, empty state and all. The grouped page has its own second key, which the count in the sidebar group opens directly — no redirect.
+It only **inserts**, never hides or reorders anything the app renders.
 
 ### The seam is defensive
 
-- Anchored from the plugin's own node (`closest`-style walk), never from a global selector.
+- Anchored from the plugin's own node, never from a global selector.
 - Matches build-hashed class **suffixes** (`*_listArea`, `*_list`, `*_groupSection`), so it survives class-hash changes.
 - Skips the flat "In one list" view and the search view (no workspace groups to sit above).
 - If the expected structure is missing, it does nothing and logs one line:
-  `[dsh-pinned-panel] sidebar list seam not found; the Pinned page in the sidebar rail still works.`
-- The page surface never depends on the seam.
+  `[dsh-pinned-panel] sidebar list seam not found; the Pinned group cannot be placed.`
 
-One React detail matters here: portal events bubble through the **React** tree, not the DOM tree. This portal hangs under the sidebar's panel icon, so every interactive element in the injected group stops propagation — otherwise a row click would also select the Pinned panel, whose redirect would immediately pull the main column back to the newest pinned conversation (a brief flash, then the first row again).
+One React detail matters here: portal events bubble through the **React** tree, not the DOM tree, so the portaled group stops propagation for its own interactions. That keeps clicks inside the group from reaching whichever seat the portal is mounted under.
 
 ## Known limitations
 
-- The sidebar group is a **display-layer insert**. It does not change session order or write extra state; the app's own "pinned first inside the group" ordering is untouched.
-- Pinned conversations that belong to **no** workspace are grouped as *Ungrouped* on the page and shown inline (no origin label) in the sidebar group.
-- The page groups by workspace; within a group rows are ordered by last update.
+- The group is a **display-layer insert**. It does not change session order or write extra state; the app's own "pinned first inside the group" ordering is untouched.
+- Pinned conversations that belong to **no** workspace are shown inline without an origin label.
+- Rows are ordered by last update (newest first).
 - This plugin follows the app's pin semantics. It does not add its own pin storage, so everything stays consistent across reloads and browsers.
-- A future DSH release that restructures the sidebar browser may require adapting the seam (the suffixes above are the contract). The page is unaffected.
+- A future DSH release that restructures the sidebar browser may require adapting the seam (the suffixes above are the contract).
 
 ## Development
 
@@ -122,7 +118,7 @@ One React detail matters here: portal events bubble through the **React** tree, 
 package.json          bundle manifest: Host patch + browser half
 cordis.patch.yml      inserts one Host plugin row (no-op Host half)
 index.js              Host half: empty apply()
-lib/client.js         browser bundle: sidebar group seam, rail icon, Pinned page
+lib/client.js         browser bundle: overlay seat, sidebar list seam, Pinned group
 locale/{zh,en}.json   Plugin Manager title/description
 icon.svg              original artwork
 ```
