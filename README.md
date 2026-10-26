@@ -1,15 +1,27 @@
 # dsh-pinned-panel
 
+[![version](https://img.shields.io/github/v/tag/OuQiL/dsh-pinned-panel?label=version&sort=semver)](https://github.com/OuQiL/dsh-pinned-panel/tags)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-DSH%20Web%20GUI-lightgrey.svg)](#requirements)
-[![dsh](https://img.shields.io/badge/dsh-0.2.x-4B6BFB.svg)](#requirements)
 
 > **A Pinned group at the top of the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) sidebar.**
 > Pinned conversations stop being pinned *inside* one workspace: they are collected into a **Pinned group first in the session list**, expanded by default — and opening one still drops you back into **its original workspace**.
 
 English | [简体中文](README.zh-CN.md)
 
----
+## Contents
+
+- [What you get](#what-you-get)
+- [Install](#install)
+- [Requirements](#requirements)
+- [How it works](#how-it-works)
+- [Compared with dsh-pin](#compared-with-dsh-pin)
+- [FAQ and troubleshooting](#faq-and-troubleshooting)
+- [Security and privacy](#security-and-privacy)
+- [Known limitations](#known-limitations)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## What you get
 
@@ -72,9 +84,15 @@ Settings → Plugins → *dsh-pinned-panel* → disable/uninstall, or `dsh plugi
 
 ## Requirements
 
-- DeepSeek Harness **Web GUI** (the Desktop app renders the same Web surface), tested on `0.2.1-rc.2` on Windows.
-- No Host capability, no credentials, no network endpoints: the Host half is a no-op, everything is client-side.
-- Only the Web GUI has a sidebar; TUI/headless profiles have nothing to attach to.
+| | |
+|---|---|
+| Surface | DeepSeek Harness **Web GUI** (the Desktop app renders the same Web surface) |
+| Tested with | `0.2.1-rc.2` on Windows |
+| Host half | none — it is a no-op; everything runs in the browser |
+| Credentials / network | none |
+| Sidebar | required; TUI/headless profiles have nothing to attach to |
+
+Because it attaches to the sidebar list, a DSH release that restructures that list may require a small adaptation (see [How it works](#how-it-works)); the plugin degrades to "no group" rather than breaking the app.
 
 ## How it works
 
@@ -104,6 +122,54 @@ It only **inserts**, never hides or reorders anything the app renders.
 
 One React detail matters here: portal events bubble through the **React** tree, not the DOM tree, so the portaled group stops propagation for its own interactions. That keeps clicks inside the group from reaching whichever seat the portal is mounted under.
 
+## Compared with dsh-pin
+
+[dsh-pin](https://github.com/Yu-tao-Li/dsh-pin) is the closest existing plugin; both are pure client-side, both attach to the sidebar list, and both use the shipped session-order/open APIs. The difference is the shape:
+
+| | dsh-pinned-panel (this) | dsh-pin |
+|---|---|---|
+| Where pins show up | one **Pinned group** first in the session list | a **global tray** above all workspace groups, plus in-group pinning |
+| Original rows | always kept | optionally hidden for globally pinned rows |
+| Pin levels | one — it reuses the app's own pin state | two — workspace pin and global pin, with its own records |
+| Extra chrome | none (no page, no rail icon) | tray chrome and per-row pin buttons |
+| State it owns | only your collapse preference | its own `localStorage` records per pinned session |
+| Undo / restore | the app's own unpin | precise restore of the pre-pin position |
+
+If you want a floating tray and hidden original rows, use dsh-pin. If you want one extra group in the list and nothing else, use this.
+
+## FAQ and troubleshooting
+
+**The group does not appear.**
+Open the browser console. If it shows
+`[dsh-pinned-panel] sidebar list seam not found; the Pinned group cannot be placed.`,
+your DSH build moved the sidebar list and the seam needs adapting — please open an issue with that line and your DSH version.
+
+**The group appears twice, or loading fails with `loaded without registering …`.**
+An older copy under the pre-rename package id (`@local/dsh-pinned-panel`) is still installed. Uninstall it (Settings → Plugins) or restart the app; the bundle registers both ids so a leftover copy does not error out.
+
+**Clicking a row keeps ending on the same conversation.**
+Fixed in `0.1.6`; make sure you are on `0.3.0`+ (console prints `[dsh-pinned-panel] active vX.Y.Z`).
+
+**How do I verify which version is loaded?**
+The console line on page load, or the Plugins page entry.
+
+**Do I need to configure anything?**
+No settings. The only stored value is your collapse choice, under the `dsh-pinned-panel.sidebar.collapsed` key.
+
+**Does it work across browsers?**
+Pin state comes from the Host, so yes. The collapse preference is per browser.
+
+**Where do I unpin?**
+The app's own 📌 action (as before), or the ✕ that appears on a row in the group.
+
+## Security and privacy
+
+- **No network requests, no telemetry, no credentials.** The Host half is an empty `apply()`.
+- **Reads** the Host workspace and session snapshots the sidebar already displays (titles, ids, timestamps, workspace membership).
+- **Writes** exactly one browser key: `localStorage['dsh-pinned-panel.sidebar.collapsed']`. Pin changes are the app's own actions through `uiWorkspace`.
+- **DOM**: inserts one host element as the first child of the sidebar list and renders into it with a React portal. Nothing else in the app is modified, hidden, or reordered.
+- **Styles**: an inline `<style>` element registered with the plugin's lifetime and using only DSH theme tokens.
+
 ## Known limitations
 
 - The group is a **display-layer insert**. It does not change session order or write extra state; the app's own "pinned first inside the group" ordering is untouched.
@@ -118,14 +184,16 @@ One React detail matters here: portal events bubble through the **React** tree, 
 package.json          bundle manifest: Host patch + browser half
 cordis.patch.yml      inserts one Host plugin row (no-op Host half)
 index.js              Host half: empty apply()
-lib/client.js         browser bundle: overlay seat, sidebar list seam, Pinned group
+lib/client.js         browser bundle: sidebar seat, list seam, Pinned group
 locale/{zh,en}.json   Plugin Manager title/description
 icon.svg              original artwork
+scripts/verify.mjs    local self-check (encoding, JSON, manifest, client module)
+scripts/ci-workflow-template.yml  drop-in GitHub Actions workflow for that check
 ```
 
 ```bash
-node --check lib/client.js
-node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
+node scripts/verify.mjs     # encoding + JSON + manifest + client module
+node --check lib/client.js  # syntax only
 ```
 
 There is no build step: `lib/client.js` is the shipped browser module
@@ -134,6 +202,19 @@ It registers the factory under both the current package id and the pre-rename
 `@local/dsh-pinned-panel` id, so a profile that still has the old package installed keeps
 loading instead of failing with `loaded without registering …`. The legacy id is inert once
 that package is uninstalled.
+
+See [CHANGELOG.md](CHANGELOG.md) for the release history, including the two bugs that shaped the
+current implementation (portaled event bubbling, and a UTF-8 BOM that broke GitHub installs).
+
+## Contributing
+
+Issues and pull requests are welcome.
+
+- For a bug report, include your DSH version and every console line starting with `[dsh-pinned-panel]`.
+- Before opening a pull request, run `node scripts/verify.mjs`.
+- `scripts/ci-workflow-template.yml` is a ready-to-use Actions workflow for that check; copy it to
+  `.github/workflows/verify.yml` from an account/token allowed to edit workflows.
+- Anything that changes visual behaviour should say which DSH build it was verified on.
 
 ## License
 
