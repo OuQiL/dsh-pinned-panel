@@ -106,6 +106,8 @@ The rail icon is the shell's own panel button, and its click selects the `main` 
   `[dsh-pinned-panel] sidebar list seam not found; the Pinned page in the sidebar rail still works.`
 - The page surface never depends on the seam.
 
+One React detail matters here: portal events bubble through the **React** tree, not the DOM tree. This portal hangs under the sidebar's panel icon, so every interactive element in the injected group stops propagation — otherwise a row click would also select the Pinned panel, whose redirect would immediately pull the main column back to the newest pinned conversation (a brief flash, then the first row again).
+
 ## Known limitations
 
 - The sidebar group is a **display-layer insert**. It does not change session order or write extra state; the app's own "pinned first inside the group" ordering is untouched.

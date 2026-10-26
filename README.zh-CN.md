@@ -105,6 +105,8 @@ dsh plugin add /absolute/path/to/dsh-pinned-panel
   `[dsh-pinned-panel] sidebar list seam not found; the Pinned page in the sidebar rail still works.`
 - 整页面板完全不依赖注入层。
 
+这里有一个必须注意的 React 细节：**portal 的事件冒泡走 React 树，不走 DOM 树**。这个 portal 挂在侧边栏图标按钮下面，所以注入分组里每个可交互元素都做了 `stopPropagation()`——否则点一行会同时触发图标按钮的"选中置顶面板"，而那个面板的跳转入口会立刻把主区域拽回最新置顶那条（表现为"闪一下又回到第一条"）。
+
 ## 已知边界
 
 - 列表分组是**显示层**追加：不改会话顺序、不写额外存储，应用自带"置顶在组内最前"的行为原样保留。
