@@ -2,6 +2,18 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.4.0 — per-row actions
+
+- **New:** each pinned row has a ⋮ menu with the shipped per-session actions: **fork**
+  (`uiWorkspace.forkSession`, then the fork opens), **copy session ID**, **unpin**
+  (`uiWorkspace.unpinSession`) and **archive** (`uiWorkspace.archiveSession`).
+- Archiving a conversation that is still running asks first: the menu switches to
+  *stop and archive* / *cancel*, matching the shipped row's confirmation instead of
+  silently stopping work.
+- The quick ✕ unpin on hover stays; the menu is the discoverable path for the rest.
+- Rename is intentionally not in the menu: it belongs to the shipped row's double-click
+  flow over the browser's own overlay state, which a client half cannot open.
+
 ## 0.3.0 — single-surface release
 
 - **Removed** the sidebar rail entry (the 📌 panel icon), the full Pinned page, and the

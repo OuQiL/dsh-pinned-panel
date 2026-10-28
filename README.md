@@ -48,6 +48,7 @@ Sidebar
 - **Click a row → the conversation opens in its original workspace.** It uses the official `uiWorkspace.openSession()` call, exactly like clicking that row in the sidebar: same working directory, same context, same history.
 - **Rows are not duplicated into a private store.** The group reads the Host's own `pinnedSessionIds` and workspace membership; pinning/unpinning stays the shipped 📌 action (plus a ✕ on hover).
 - **Origin is visible.** Each row shows the workspace it belongs to; hover it for the full title.
+- **Per-row actions without leaving the group.** Hover a row for its ⋯ menu: **fork**, **copy session ID**, **unpin**, or **archive** — all through the same official calls the shipped rows use (`forkSession`, `unpinSession`, `archiveSession`). Archiving a conversation that is still running asks *stop and archive* first instead of silently ending its work.
 - **Original rows stay.** A pinned conversation is still listed under its own workspace — the Pinned group is an extra entry point, not a move.
 - **No extra panel, no extra page.** The plugin adds the group and nothing else; there is no pinned page and no rail icon to configure.
 
