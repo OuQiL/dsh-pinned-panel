@@ -9,6 +9,12 @@
 
 [English](README.md) | 简体中文
 
+<p align="center">
+  <img src="assets/sidebar-pinned-zh.png" alt="侧边栏最上方的「置顶」分组，位于所有工作区分组之上，列出两条置顶对话及其来源工作区与时间" width="340">
+</p>
+
+<p align="center"><em>「置顶」分组在会话列表最上方：两条来自同一工作区的置顶对话，点开仍各自回到原工作区。</em></p>
+
 ## 目录
 
 - [效果](#效果)
@@ -189,6 +195,7 @@ locale/{zh,en}.json   插件管理里显示的名称与描述
 icon.svg              原创建意图标
 scripts/verify.mjs    本地自检（编码、JSON、清单、客户端模块）
 scripts/ci-workflow-template.yml  可直接启用的 GitHub Actions 工作流
+assets/               README 用的侧边栏分组截图
 ```
 
 ```bash

@@ -9,6 +9,12 @@
 
 English | [简体中文](README.zh-CN.md)
 
+<p align="center">
+  <img src="assets/sidebar-pinned-zh.png" alt="The Pinned group at the top of the sidebar, above the workspace groups, listing two pinned conversations with their origin workspace and time" width="340">
+</p>
+
+<p align="center"><em>Pinned group first in the session list — two pinned conversations from one workspace, each still opening in its own workspace. (Chinese UI shown; titles and labels follow the active locale.)</em></p>
+
 ## Contents
 
 - [What you get](#what-you-get)
@@ -189,6 +195,7 @@ locale/{zh,en}.json   Plugin Manager title/description
 icon.svg              original artwork
 scripts/verify.mjs    local self-check (encoding, JSON, manifest, client module)
 scripts/ci-workflow-template.yml  drop-in GitHub Actions workflow for that check
+assets/               README screenshot of the sidebar group
 ```
 
 ```bash
