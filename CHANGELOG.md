@@ -2,6 +2,17 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.5.0 — rename in place
+
+- **New:** rename a pinned conversation without leaving the group: **double-click its title**
+  (or pick *Rename* in the ⋮ menu) to turn the title into an input, then Enter to save,
+  Escape to cancel, blur to save when changed.
+- The call is the same one the shipped browser makes:
+  `sessions.using(sessionId, { source: 'workspaceOperation' }, (ref) => ref.binding.session.rename(title))`,
+  so the Host validates the title, publishes the new one and raises its own errors. A rejected
+  `RemoteResult` is logged and the row keeps showing the old title.
+- Renaming suppresses the row's open/navigation click while the input is focused.
+
 ## 0.4.0 — per-row actions
 
 - **New:** each pinned row has a ⋮ menu with the shipped per-session actions: **fork**

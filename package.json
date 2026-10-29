@@ -1,6 +1,6 @@
 {
   "name": "dsh-pinned-panel",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A Pinned group at the top of the DeepSeek Harness sidebar: every pinned conversation from every workspace, opening in its original workspace.",
   "license": "MIT",
   "author": "OuQiL",
