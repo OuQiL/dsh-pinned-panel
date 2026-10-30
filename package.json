@@ -5,6 +5,10 @@
   "license": "MIT",
   "author": "OuQiL",
   "type": "module",
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "prepublishOnly": "node scripts/verify.mjs"
+  },
   "keywords": [
     "dsh",
     "dsh-plugin",
