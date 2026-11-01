@@ -50,6 +50,7 @@ Sidebar
 - **Origin is visible.** Each row shows the workspace it belongs to; hover it for the full title.
 - **Per-row actions without leaving the group.** Hover a row for its ⋯ menu: **rename**, **fork**, **copy session ID**, **unpin**, or **archive** — all through the same calls the shipped rows make (`session.rename`, `forkSession`, `unpinSession`, `archiveSession`). **Double-click a title** to rename it in place (Enter saves, Escape cancels). Archiving a conversation that is still running asks *stop and archive* first instead of silently ending its work.
 - **Original rows stay.** A pinned conversation is still listed under its own workspace — the Pinned group is an extra entry point, not a move.
+- **Archived section.** A collapsed *Archived N* entry under the rows expands into the archived conversations, each with a one-click restore (`uiWorkspace.unarchiveSession`) — archiving by accident no longer means hunting through the full archive view.
 - **No extra panel, no extra page.** The plugin adds the group and nothing else; there is no pinned page and no rail icon to configure.
 
 ## Install

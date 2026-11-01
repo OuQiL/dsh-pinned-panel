@@ -2,6 +2,17 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.6.0 — archived section
+
+- **New:** an **Archived** section under the pinned rows (collapsed by default, choice remembered):
+  *Archived N* expands into the archived conversations, newest first, each with a restore button that
+  calls the official `uiWorkspace.unarchiveSession()`.
+- Archived rows are display-only: they do not open (an archived Session is not openable) and they are
+  dimmed so they read as secondary.
+- The group now also renders when there are no pinned rows but archived ones exist, so archiving the
+  last pinned conversation does not hide the only way back.
+- New storage key: `dsh-pinned-panel.sidebar.archived-open`.
+
 ## 0.5.0 — rename in place
 
 - **New:** rename a pinned conversation without leaving the group: **double-click its title**
