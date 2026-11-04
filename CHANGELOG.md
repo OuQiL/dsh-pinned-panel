@@ -2,6 +2,19 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.7.0 — activity dot
+
+- **New:** each pinned row shows the conversation's activity in its leading slot, replacing the pin
+  glyph while something is happening: a **pulsing dot while running** (business color), a **warning
+  dot while waiting for approval / plan review / an answer**, and a **success dot for an unread
+  completion**.
+- The state comes from the shipped Session-status snapshot (`useSessionStatus`, i.e.
+  `Map<SessionId, { running, pendingInteraction, completionUnread }>`), so it matches the dots the
+  shipped rows draw and updates live. A pending interaction outranks running, which outranks an
+  unread completion.
+- The dot carries a localized tooltip/`aria-label` ("运行中", "等待审批", "等待回答", …); archived
+  rows keep the archive glyph and show no activity.
+
 ## 0.6.0 — archived section
 
 - **New:** an **Archived** section under the pinned rows (collapsed by default, choice remembered):
