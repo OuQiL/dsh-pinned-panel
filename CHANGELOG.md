@@ -2,6 +2,15 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.7.1 — archived section stays small
+
+- The **Archived** section is **collapsed by default** (only a saved expansion opens it), and it now
+  shows **at most the 10 most recent archived conversations**. A muted *Show all · N* row reveals the
+  rest and switches back to *Show the latest 10* — so a long archive never pushes the workspace list
+  off screen.
+- The limit only applies while the section is expanded; the stored preference still decides whether
+  it starts open.
+
 ## 0.7.0 — activity dot
 
 - **New:** each pinned row shows the conversation's activity in its leading slot, replacing the pin
