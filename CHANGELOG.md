@@ -2,6 +2,17 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.7.2 — menu ergonomics and release guards
+
+- **Right-click** a pinned row to open the same ⋯ menu, and the menu is keyboard-navigable:
+  <kbd>↑</kbd>/<kbd>↓</kbd> move, <kbd>Home</kbd>/<kbd>End</kbd> jump, <kbd>Enter</kbd> activates,
+  <kbd>Esc</kbd> closes. Focus enters the menu on open.
+- The seam's fallback tick now runs every 4s instead of 800ms; the `MutationObserver` stays the
+  primary trigger, so this only covers missed container replacements.
+- `scripts/verify.mjs` now also fails on **version drift** (`lib/client.js` vs `package.json` vs the
+  newest `CHANGELOG.md` heading) and on a **zh/en dictionary key mismatch**, and warns about README
+  table-of-contents anchors without a matching heading.
+
 ## 0.7.1 — archived section stays small
 
 - The **Archived** section is **collapsed by default** (only a saved expansion opens it), and it now

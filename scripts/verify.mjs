@@ -68,9 +68,74 @@ for (const id of ['dsh-pinned-panel', '@local/dsh-pinned-panel']) {
   if (!source.includes(`load({ id: '${id}'`)) fail(`client bundle does not register module id ${id}`);
 }
 
+/* Version consistency: the client constant, the manifest and the newest changelog
+   heading must agree, so a release cannot drift from its own notes. */
+const clientVersion = source.match(/const VERSION = '(\d+\.\d+\.\d+)'/);
+if (clientVersion === null) fail('lib/client.js does not declare a VERSION constant');
+const changelog = fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8');
+const changelogVersion = changelog.match(/^## (\d+\.\d+\.\d+)/m);
+if (changelogVersion === null) fail('CHANGELOG.md does not start with a "## x.y.z" heading');
+if (clientVersion !== null && changelogVersion !== null && clientVersion[1] !== changelogVersion[1]) {
+  fail(`version drift: lib/client.js ${clientVersion[1]} vs CHANGELOG.md ${changelogVersion[1]}`);
+}
+if (clientVersion !== null && manifest.version !== clientVersion[1]) {
+  fail(`version drift: lib/client.js ${clientVersion[1]} vs package.json ${manifest.version}`);
+}
+
+/* Dictionary parity: both languages must define exactly the same keys. */
+function dictionaryKeys(declaration) {
+  const start = source.indexOf(`const ${declaration} = {`);
+  if (start < 0) return null;
+  const end = source.indexOf('};', start);
+  const block = source.slice(start, end);
+  const keys = new Set();
+  for (const match of block.matchAll(/([A-Za-z_][A-Za-z0-9_]*)\s*:/g)) keys.add(match[1]);
+  return keys;
+}
+const zhKeys = dictionaryKeys('zh');
+const enKeys = dictionaryKeys('en');
+if (zhKeys === null || enKeys === null) {
+  fail('lib/client.js does not declare both zh and en dictionaries');
+} else {
+  for (const key of zhKeys) if (!enKeys.has(key)) fail(`dictionary key "${key}" is missing from en`);
+  for (const key of enKeys) if (!zhKeys.has(key)) fail(`dictionary key "${key}" is missing from zh`);
+}
+
+/* README anchors: same-slug check for the table of contents. Warnings only, since
+   GitHub slugging has edge cases this script does not model. */
+const warnings = [];
+function slugify(text) {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[“”‘’"'`]/g, '')
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .replace(/\s/g, '-');
+}
+for (const readme of ['README.md', 'README.zh-CN.md']) {
+  const file = path.join(root, readme);
+  if (!fs.existsSync(file)) {
+    fail(`missing ${readme}`);
+    continue;
+  }
+  const text = fs.readFileSync(file, 'utf8');
+  const headings = new Set();
+  for (const line of text.split('\n')) {
+    const match = line.match(/^#{2,3}\s+(.+)$/);
+    if (match !== null) headings.add(slugify(match[1]));
+  }
+  for (const match of text.matchAll(/\]\(#([^)]+)\)/g)) {
+    if (!headings.has(match[1])) warnings.push(`${readme}: anchor "#${match[1]}" has no heading`);
+  }
+}
+
 if (failures.length > 0) {
   for (const failure of failures) console.error(`FAIL ${failure}`);
   console.error(`\n${failures.length} problem(s)`);
   process.exit(1);
 }
-console.log(`OK — ${textFiles.length} text files clean, manifest and client bundle verified`);
+for (const warning of warnings) console.warn(`WARN ${warning}`);
+console.log(
+  `OK — ${textFiles.length} text files clean, v${clientVersion[1]} consistent across manifest/changelog, ` +
+  `${zhKeys.size} dictionary keys aligned, manifest and client bundle verified`,
+);
