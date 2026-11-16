@@ -16,5 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Verify bundle (encoding, JSON, manifest, client module)
+      - name: Verify bundle (encoding, JSON, manifest, versions, dictionaries)
         run: node scripts/verify.mjs
+      - name: Unit tests (pure sidebar logic)
+        run: npm test

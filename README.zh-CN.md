@@ -196,13 +196,15 @@ index.js              Host 半边：空 apply()
 lib/client.js         浏览器 bundle：侧边栏座位、列表注入、置顶分组
 locale/{zh,en}.json   插件管理里显示的名称与描述
 icon.svg              原创建意图标
-scripts/verify.mjs    本地自检（编码、JSON、清单、客户端模块）
+scripts/verify.mjs    本地自检（编码、JSON、清单、版本一致性、中英词条）
+test/                 纯逻辑单元测试（node --test）
 scripts/ci-workflow-template.yml  可直接启用的 GitHub Actions 工作流
 assets/               README 用的侧边栏分组截图
 ```
 
 ```bash
-node scripts/verify.mjs     # 编码 + JSON + 清单 + 客户端模块
+node scripts/verify.mjs     # 编码 + JSON + 清单 + 版本/词条守卫
+node --test "test/**/*.test.mjs"   # 排序、过滤、标题/来源回退、状态点优先级
 node --check lib/client.js  # 仅语法
 ```
 
@@ -218,7 +220,7 @@ node --check lib/client.js  # 仅语法
 欢迎 issue 与 PR。
 
 - 报 bug 请附 DSH 版本 + 所有以 `[dsh-pinned-panel]` 开头的控制台日志；
-- 提 PR 前请跑 `node scripts/verify.mjs`；
+- 提 PR 前请跑 `npm run check`（= `verify.mjs` + `node --test`）；
 - `scripts/ci-workflow-template.yml` 是同一套检查的 Actions 工作流，复制成 `.github/workflows/verify.yml` 即可启用（需要具备 workflow 权限的账号/token）；
 - 涉及视觉行为的改动，请说明在哪个 DSH 版本上验证过。
 

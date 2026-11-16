@@ -196,13 +196,15 @@ index.js              Host half: empty apply()
 lib/client.js         browser bundle: sidebar seat, list seam, Pinned group
 locale/{zh,en}.json   Plugin Manager title/description
 icon.svg              original artwork
-scripts/verify.mjs    local self-check (encoding, JSON, manifest, client module)
-scripts/ci-workflow-template.yml  drop-in GitHub Actions workflow for that check
+scripts/verify.mjs    local self-check (encoding, JSON, manifest, versions, dictionaries)
+test/                 unit tests for the pure sidebar logic (node --test)
+scripts/ci-workflow-template.yml  drop-in GitHub Actions workflow for both checks
 assets/               README screenshot of the sidebar group
 ```
 
 ```bash
-node scripts/verify.mjs     # encoding + JSON + manifest + client module
+node scripts/verify.mjs     # encoding + JSON + manifest + version/dictionary guards
+node --test "test/**/*.test.mjs"   # pure logic: ordering, filtering, labels, activity
 node --check lib/client.js  # syntax only
 ```
 
@@ -221,7 +223,7 @@ current implementation (portaled event bubbling, and a UTF-8 BOM that broke GitH
 Issues and pull requests are welcome.
 
 - For a bug report, include your DSH version and every console line starting with `[dsh-pinned-panel]`.
-- Before opening a pull request, run `node scripts/verify.mjs`.
+- Before opening a pull request, run `npm run check` (`verify.mjs` + `node --test`).
 - `scripts/ci-workflow-template.yml` is a ready-to-use Actions workflow for that check; copy it to
   `.github/workflows/verify.yml` from an account/token allowed to edit workflows.
 - Anything that changes visual behaviour should say which DSH build it was verified on.

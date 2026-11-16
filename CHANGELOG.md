@@ -2,6 +2,20 @@
 
 All notable changes to this plugin. Versions follow [SemVer](https://semver.org/).
 
+## 0.7.3 — unit tests
+
+- **New:** `test/` runs on Node's built-in runner (`node --test`). `test/harness.mjs` loads
+  `lib/client.js` in a `vm` sandbox with stubbed `window.__ModuleLoader__`/React and reads the pure
+  helpers from a **test-only hook** (`__DSH_PINNED_PANEL_TEST__`), so nothing extra ships to the
+  client.
+- Twelve tests cover `toMillis`/`timeLabel`, id/title/workspace fallbacks, `byUpdatedDesc`, the
+  pinned and archived row builders (filtering, unknown summaries, labels, ordering) and
+  `rowActivity` precedence.
+- `rowActivity` now treats a live status entry as authoritative: `running: false` means idle even when
+  the session summary still carries a stale `running: true` (caught by the new tests).
+- Scripts: `npm test` and `npm run check`; `prepublishOnly` runs both. The CI template runs the tests
+  as a second step.
+
 ## 0.7.2 — menu ergonomics and release guards
 
 - **Right-click** a pinned row to open the same ⋯ menu, and the menu is keyboard-navigable:

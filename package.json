@@ -1,13 +1,15 @@
 {
   "name": "dsh-pinned-panel",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A Pinned group at the top of the DeepSeek Harness sidebar: every pinned conversation from every workspace, opening in its original workspace.",
   "license": "MIT",
   "author": "OuQiL",
   "type": "module",
   "scripts": {
     "verify": "node scripts/verify.mjs",
-    "prepublishOnly": "node scripts/verify.mjs"
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "check": "node scripts/verify.mjs && node --test \"test/**/*.test.mjs\"",
+    "prepublishOnly": "node scripts/verify.mjs && node --test \"test/**/*.test.mjs\""
   },
   "keywords": [
     "dsh",
